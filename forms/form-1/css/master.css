@@ -1,0 +1,273 @@
+/* -----------------------------------
+Site:       Create an account
+CSS author: Russ Weakley
+Updated:	Date here
+Updated by: Date here
+----------------------------------- */
+
+/* -----------------------------------
+simple reset
+----------------------------------- */
+
+html, body, ul, ol, li, form, fieldset, legend
+{
+	margin: 0;
+	padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6 { margin-top: 0; }
+fieldset, img { border: 0; }
+legend { color: #000; }
+
+input, textarea, select, button
+{
+	font-size: 100%;
+	line-height: 1.2;
+	font-family: helvetica, arial, sans-serif;
+}
+
+button
+{
+	width: auto;
+	overflow: visible;
+}
+
+table
+{
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+caption, th, td
+{
+	text-align: left;
+	vertical-align: top;
+	font-weight: normal;
+}
+
+li { list-style: none; }
+
+abbr, acronym
+{
+	border-bottom: .1em dotted;
+	cursor: help;
+}
+
+sup { vertical-align: text-top; }
+sub { vertical-align: text-bottom; }
+
+pre, code
+{
+	font-family: "Courier New", monospace, serif;
+	font-size: 100%;
+	line-height: 1.2;
+}
+
+/* -----------------------------------
+elements
+----------------------------------- */
+
+body
+{
+	color: #222;
+	background: #fff;
+	font: 100% "DejaVu Sans", "URW Gothic L", "Helvetica Neue", Helvetica, Arial, "Microsoft Sans Serif", sans-serif;
+}
+
+/* -----------------------------------
+container
+----------------------------------- */
+
+.container
+{
+	width: 680px;
+	margin: 1em auto;
+}
+
+/* -----------------------------------
+h1
+----------------------------------- */
+
+h1
+{
+	margin: 0;
+	padding: 10px 20px 15px;
+	-webkit-border-radius: 6px 6px 0 0;
+	-moz-border-radius: 6px 6px 0 0;
+	border-radius: 6px 6px 0 0;
+	color: #fff;
+	background-color: #054C81;
+	background-image: -webkit-gradient(linear, center bottom, center top, from(#054C81), to(#0595B3));
+	background-image: -moz-linear-gradient(90deg, #054C81, #0595B3);
+	font-size: 160%;
+	font-weight: normal;
+}
+
+/* -----------------------------------
+form container
+----------------------------------- */
+
+.form-container
+{
+	padding: 0 20px 15px;
+	-webkit-border-radius: 0 0 6px 6px;
+	-moz-border-radius: 0 0 6px 6px;
+	border-radius: 0 0 6px 6px;
+	background-color: #eee;
+	background-image: -webkit-gradient(linear, center bottom, center top, from(#ddd), to(#eee));
+	background-image: -moz-linear-gradient(90deg, #ddd, #eee);
+	-webkit-box-shadow: 0 5px 20px #999;
+	-moz-box-shadow: 0 5px 20px #999;
+	box-shadow: 0 5px 20px #999;
+}
+
+.form-container p
+{
+	margin: 0;
+	padding: 20px 0 0;
+	font-size: 90%;
+}
+
+/* -----------------------------------
+div
+----------------------------------- */
+
+.account div
+{
+	margin: 0 0 4px;
+	padding: 4px 0;
+}
+
+.account div:hover { background: #ddd; }
+
+/* -----------------------------------
+special classes
+----------------------------------- */
+
+.hidden
+{
+	position: absolute;
+	left: -500em;
+}
+
+.mandatory { color: red; }
+
+/* -----------------------------------
+label
+----------------------------------- */
+
+.account label, .account .label-select
+{
+	float: left;
+	width: 190px;
+	margin: 0 15px 0 0;
+	padding: 5px 0 0;
+	text-align: right;
+}
+
+.account .label-checkbox { padding: 2px 0 0; }
+
+/* -----------------------------------
+legend span
+----------------------------------- */
+
+.account legend span
+{
+	display: block;
+	width: 320px;
+	padding: 15px 0 10px 205px;
+	font-size: 125%;
+	font-weight: bold;
+}
+
+/* -----------------------------------
+input
+----------------------------------- */
+
+.input-wide
+{
+	width: 288px;
+	height: 24px;
+	margin: 0;
+	padding: 3px 3px 3px 27px;
+	-webkit-border-radius: 6px;
+	-moz-border-radius: 6px;
+	border-radius: 6px;
+	border: 1px solid #b4b4b4;
+	background: #fff url(../images/sprite.png) no-repeat -1px -1px;
+}
+
+.name { background: #fff url(../images/sprite.png) no-repeat -1px -1px; }
+.email { background: #fff url(../images/sprite.png) no-repeat -1px -33px; }
+.phone { background: #fff url(../images/sprite.png) no-repeat -1px -65px; }
+.password { background: #fff url(../images/sprite.png) no-repeat -1px -97px; }
+.address { background: #fff url(../images/sprite.png) no-repeat -1px -129px; }
+.bio { background: #fff url(../images/sprite.png) no-repeat -1px -161px; }
+
+.input-textarea { height: 150px; }
+
+/* -----------------------------------
+submit
+----------------------------------- */
+
+.account .submit
+{
+	width: 435px;
+	margin: 0;
+	padding: 20px 0 20px 205px;
+}
+
+.submit input
+{
+	margin: 0;
+	padding: 5px 20px;
+	-webkit-border-radius: 6px;
+	-moz-border-radius: 6px;
+	border-radius: 6px;
+	border: 0 none;
+	color: #fff;
+	background-color: #054C81;
+	background-image: -webkit-gradient(linear, center bottom, center top, from(#054C81), to(#0595B3));
+	background-image: -moz-linear-gradient(90deg, #054C81, #0595B3);
+	font-size: 110%;
+}
+
+/* -----------------------------------
+select
+----------------------------------- */
+
+#birthdate, #birthmonth, #birthyear, #country { border: 1px solid #b4b4b4; }
+#country { width: 320px; }
+
+/* -----------------------------------
+warning messages
+----------------------------------- */
+
+.warning-message
+{
+	color: red;
+	background: #edd3d4;
+	margin: 15px 0 0;
+	padding: 10px;
+}
+
+.warning-message a:link, .warning-message a:visited
+{
+	color: red;
+	font-weight: bold;
+}
+
+.account .warning
+{
+	color: red;
+	background: #edd3d4 url(../images/sprite.png) no-repeat -640px 50%;
+}
+
+.account .warning:hover { background: #edd3d4 url(../images/sprite.png) no-repeat -640px 50%; }
+.warning .input-wide { border: 1px solid red; }
+.warning .name { background: #fff url(../images/sprite.png) no-repeat -321px -1px; }
+.warning .email { background: #fff url(../images/sprite.png) no-repeat -321px -33px; }
+.warning .phone { background: #fff url(../images/sprite.png) no-repeat -321px -65px; }
+.warning .password { background: #fff url(../images/sprite.png) no-repeat -321px -97px; }
+.warning .address { background: #fff url(../images/sprite.png) no-repeat -321px -129px; }
+.warning .bio { background: #fff url(../images/sprite.png) no-repeat -321px -161px; }
