@@ -1,16 +1,24 @@
 /**************
 * body styles *
 **************/
+:root {
+    --a: rgb(226, 206, 180);
+    --darker: burlywood;
+    --hover: rgb(151, 96, 24);
+    --gray: rgb(52, 52, 59);
+    --light: #fdfcfc;
+}
+
 html {
-    background-color: #fdfcfc;
+    background-color: var(--light);
 }
 
 body {
     max-width: 1000px;
     min-height: 100vh;
     margin: 10px auto 0 auto;
-    background-color: rgb(52, 52, 59);
-    color: white;
+    background-color: var(--gray);
+    color: var(--light);
     padding: 2rem;
 }
 
@@ -20,10 +28,10 @@ body {
 
 #menu {
 	font-size: 1.5rem;
-	border: 1px solid rgba(0,0,0,.3);
+	border: 1px solid var(--gray);
 	padding: 3px 7px 6px;
-	background-color: burlywood;
-	color: #000;
+	background-color: var(--darker);
+	color: var(--gray);
  	position: relative;
 	margin-left: 90%;
 	top: 1rem;
@@ -35,7 +43,7 @@ body {
 
 #menu.open::before {
 	content: "❌";
-    color: rgb(226, 206, 180);
+    color: var(--a);
 }
 
 .navigation {
@@ -56,17 +64,17 @@ body {
 	padding: 1rem;
 	text-align: center;
 	text-decoration: none;
-	color: rgb(226, 206, 180);
+	color: var(--a);
 }
 
 .navigation li a:hover {
-	color: rgb(151, 96, 24);
+	color: var(--hover);
 	font-weight: 700;
 }
 
 .navigation li a.active {
-    color: black;
-    background-color: burlywood;
+    color: var(--gray);
+    background-color: var(--darker);
     font-weight: bold;
     border-radius: .3rem;
 }
@@ -85,13 +93,13 @@ body {
 	display: block;
 	width: 100%;
     margin: .5rem auto;
-    background-color: burlywood;
+    background-color: var(--darker);
     border-radius: .5rem;
 }
 
 .open li a {
 	display: block;
-    color: black;
+    color: var(--gray);
 }
 
 /************************
@@ -116,6 +124,6 @@ body {
 	}
 
     .navigation li a {
-        color: burlywood;
+        color: var(--darker);
     }
 }
