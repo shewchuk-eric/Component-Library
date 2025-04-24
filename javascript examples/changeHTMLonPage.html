@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Change Page With JS</title>
+</head>
+<body>
+
+
+<!-- Use JS to insert stuff into the page
+     this method does not allow for the use of HTML
+     unless you 'createElement' as is done below -->
+<ol id="ol">
+    <li>0</li>
+    <li>1</li>
+    <li>2</li>
+  </ol>
+  
+  <script>
+    ol.before('before'); // insert string "before" before <ol>
+    ol.after('after'); // insert string "after" after <ol>
+    let headBefore = document.createElement('h2')
+    headBefore.innerHTML = 'Big Before';
+    ol.before(headBefore);
+  
+    let liFirst = document.createElement('li');
+    liFirst.innerHTML = 'prepend';
+    ol.prepend(liFirst); // insert liFirst at the beginning of <ol>
+  
+    let liLast = document.createElement('li');
+    liLast.innerHTML = 'append';
+    ol.append(liLast); // insert liLast at the end of <ol>
+  </script>
+
+
+<!-- Use JS to insert HTML elements into the page -->
+<div id="div"></div>
+<script>
+  div.insertAdjacentHTML('beforebegin', '<p>Hello</p>');
+  div.insertAdjacentHTML('afterbegin', '<p>At the Front</p>');
+  div.insertAdjacentHTML('beforeend', '<p>Following</p>');
+  div.insertAdjacentHTML('afterend', '<p>Bye</p>');
+  //document.getElementById('div').style.color = 'green';
+  div.style.color = 'orange';
+</script>
+
+</body>
+</html>
