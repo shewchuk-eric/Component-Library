@@ -4,45 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Change Page With JS</title>
+  <!--<script src="functionals.js"></script> -->
 </head>
 <body>
 
 
-<!-- Use JS to insert stuff into the page
-     this method does not allow for the use of HTML
-     unless you 'createElement' as is done below -->
+<!-- Use JS to insert stuff into the page -->
 <ol id="ol">
     <li>0</li>
     <li>1</li>
     <li>2</li>
-  </ol>
+</ol>
   
   <script>
+    /* The following lines do not create or use any type of HTML element
+      which means they are only inserting a string and cannot be styled. */
     ol.before('before'); // insert string "before" before <ol>
     ol.after('after'); // insert string "after" after <ol>
-    let headBefore = document.createElement('h2')
+
+    /* The next lines create an HTML element and can be styled using CSS.
+      All other HTML element characteristics will also apply. The three lines
+      must all be written as shown. Proper element display (i.e. H3, or whatever,
+      will break down if the second line is added onto the first - as in:
+      let headBefore = document.createElement('h2').innerHTML = 'Big Before';) */
+    let headBefore = document.createElement('h2');
     headBefore.innerHTML = 'Big Before';
-    ol.before(headBefore);
+    ol.before(headBefore); // this inserts 'headBefore' as an H2 just before 'ol' on the page
   
     let liFirst = document.createElement('li');
     liFirst.innerHTML = 'prepend';
-    ol.prepend(liFirst); // insert liFirst at the beginning of <ol>
+    ol.prepend(liFirst); // insert 'liFirst' as the first item of 'ol'
   
     let liLast = document.createElement('li');
     liLast.innerHTML = 'append';
-    ol.append(liLast); // insert liLast at the end of <ol>
+    ol.append(liLast); // insert 'liLast' as the final item of 'ol'
+
+    let outside = document.createElement('h2');
+    outside.innerHTML = 'Wait For Me!';
+    ol.after(outside);
   </script>
 
 
-<!-- Use JS to insert HTML elements into the page -->
+<!-- The following method creates an HTML element and inserts it onto the page
+  in a single step, as opposed to the method above on lines 29-31, for example.
+  There are four methods, as shown below, that correspond to the methods shown above. -->
 <div id="div"></div>
 <script>
-  div.insertAdjacentHTML('beforebegin', '<p>Hello</p>');
-  div.insertAdjacentHTML('afterbegin', '<p>At the Front</p>');
-  div.insertAdjacentHTML('beforeend', '<p>Following</p>');
-  div.insertAdjacentHTML('afterend', '<p>Bye</p>');
-  //document.getElementById('div').style.color = 'green';
-  div.style.color = 'orange';
+  div.insertAdjacentHTML('beforebegin', '<p>Hello</p>'); // insert just before 'div' on the page
+  div.insertAdjacentHTML('afterbegin', '<p>At the Front</p>'); // insert inside at the very beginning of 'div'
+  div.insertAdjacentHTML('beforeend', '<p>Following</p>'); // insert as the last item inside 'div'
+  div.insertAdjacentHTML('afterend', '<p>Bye</p>'); // insert as the first item on the page after 'div'
+  //document.getElementById('div').style.color = 'green'; // this is not needed if script is on the page - needed if script is external???
+  div.style.color = 'orange'; // color text inside 'div' orange so we can clearly see how inserting method is working
+
+  /* Can also add 'class' and 'id' attributes when creating elements using the methods shown here */
+  div.insertAdjacentHTML('afterend', '<div id="special"><p>I am my own hot thing!</p>');
+  special.style.color = 'blue';
+</script>
+
+<!-- The following methods are used to remove and replace elements on the page. -->
+ <div id="another">
+  <p id="one">This is the first paragraph.</p>
+  <p id="two">This is the second paragraph.</p>
+ </div>
+ <script>
+    let swap = document.createElement('h2'); // create an element
+    swap.innerHTML = 'First paragraph is now a heading'; // give new element some content
+    one.replaceWith(swap); // trade the new element for the old one
+    two.remove(); // delete the second <p>
+ </script>
+
+ <!-- The following rows show two ways to clear the contents out of an element -->
+  
+ <ol id="elem1">
+  <li>Hello</li>
+  <li>World</li>
+ </ol>
+
+ <ol id="elem2">
+  <li>Goodby</li>
+  <li>Cruel</li>
+  <li>World</li>
+ </ol>
+
+
+<div id="butts">
+  <input type="button" value="Remove A Line From Top List" onclick="clear1();"/>
+  <input type="button" value="Clear Element 2" onclick="clear2();"/>
+  <input type="button" value="Print A Line" onclick="printMessage();"/>
+</div>
+
+<script>
+  function clear1(){ 
+    //let elem1 = document.getElementById("elem1");
+    elem1.firstChild.remove()
+   }
+  function clear2(){
+    let elem2 = document.getElementById('elem2');
+    elem2.innerHTML = ""; // make contents of element an empty string
+  }
+  function printMessage(){
+    let butts = document.getElementById('butts');
+    butts.insertAdjacentHTML('afterend', '<h1>This is the end, my friend</h1>'); // insert a final message before the 'body' ends
+  }
+
 </script>
 
 </body>
