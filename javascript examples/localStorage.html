@@ -6,15 +6,79 @@
     <title>Local/Session Storage</title>
 </head>
 <body>
-    <!-- 'sessionStorage' data will survive a page refresh - - 'localStorage' will survive a browser restart -->
+    <h1>Local Storage</h1>
+    <p>'sessionStorage' data will survive a page refresh - - 'localStorage' will survive a browser restart</p>
     <h3>Local Storage Allows The Following Methods/Properties</h3>
         <ul>
-            <li>setItem(key, value) - store key/value pair.</li>
-            <li>getItem(key) - get the value by key.</li>
-            <li>removeItem(key) - remove the key with its value.</li>
-            <li>clear() - delete everything.</li>
-            <li>key(index) - get the key on a given position.</li>
-            <li>length - the number of stored items.</li>
+            <li><strong>setItem(key, value)</strong> - store key/value pair.</li>
+            <li><strong>getItem(key)</strong> - get the value by key.</li>
+            <li><strong>removeItem(key)</strong> - remove the key with its value.</li>
+            <li><strong>clear()</strong> - delete everything.</li>
+            <li><strong>key(index)</strong> - get the key on a given position.</li>
+            <li><strong>length</strong> - the number of stored items.</li>
         </ul>
+
+        <p>Set a key/value pair -> localStorage.setItem('test', 1);<br>
+        retrieve the value -> localStorage.getItem('test') // '1' <br><br>
+        
+        <h3>Use looping to get multiple values from localStorage:</h3>
+
+        <p><h4>Method 1:</h4>
+        for(let i=0; i<localStorage.length; i++) {<br>
+            let key = localStorage.key(i);<br>
+            alert(`${key}: ${localStorage.getItem(key)}`);<br>
+        }<br><br>
+
+        <h4>Method 2:</h4>
+        for(let key in localStorage) {<br>
+            if (!localStorage.hasOwnProperty(key)) { // tests to see if the key has a value to skip keys like "setItem", "getItem" etc<br>
+                continue;<br>
+            }<br>
+            alert(`${key}: ${localStorage.getItem(key)}`);<br>
+        }<br><br>
+
+        <h4>Method 3:</h4>
+        let keys = Object.keys(localStorage);<br>
+        for(let key of keys) {<br>
+            alert(`${key}: ${localStorage.getItem(key)}`);<br>
+        }</p>
+
+        <p><h3>If the key/value pair needs to be an object then use JSON to store the object.</h3>
+            localStorage.user = JSON.stringify({name: "John"});<br>
+            // sometime later<br>
+            let user = JSON.parse( localStorage.user );<br>
+            alert( user.name ); // John</p>
+        <script>
+            localStorage.user = JSON.stringify({name: "John"});
+            // sometime later
+            let user = JSON.parse( localStorage.user );
+            alert( user.name ); // John
+        </script>
+
+        <h1>Session Storage</h1>
+        <p>The sessionStorage object is used much less often than localStorage because<br>
+            sessionStorage exists only within the current browser tab so it's much more limited.<br>
+            The data survives page refresh, but not closing/opening the tab. Otherwise, <br>
+            properties and methods are the same.</p>
+
+        <h1>Storage Event</h1>    
+        <p>When the data gets updated in localStorage or sessionStorage, storage event triggers,<br>
+            with properties:<br></p>
+            <ul>
+                <li><strong>key</strong> - the key that was changed (null if .clear() is called).</li>
+                <li><strong>oldValue</strong> - the old value (null if the key is newly added).</li>
+                <li><strong>newValue</strong> - the new value (null if the key is removed).</li>
+                <li><strong>url</strong> - the url of the document where the update happened.</li>
+                <li><strong>storageArea</strong> - either localStorage or sessionStorage object where the update happened.</li>
+            </ul>
+        <p>This matters for certain reasons like if the document is being watched by an <em>onstorage</em> event listener.<br><br>
+            window.onstorage = event => { // can also use window.addEventListener('storage', event => {<br>
+              if (event.key != 'now') return;<br>
+              alert(event.key + ':' + event.newValue + " at " + event.url);<br>
+            };<br><br>        
+            localStorage.setItem('now', Date.now());
+        </p>
+        
+    
 </body>
 </html>

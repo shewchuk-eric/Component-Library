@@ -6,6 +6,60 @@
     <title>Modules-Import/Export</title>
 </head>
 <body>
+    <p><h1>Export</h1>
+        We can label any declaration as exported by placing export before it, be it a variable, function or a class.<br>
+        For instance, here all exports are valid:<br><br>
+        // export an array<br>
+        export let months = ['Jan', 'Feb', 'Mar','Apr', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];<br><br>
+        // export a constant<br>
+        export const MODULES_BECAME_STANDARD_YEAR = 2015;<br><br>
+        // export a class<br>
+        export class User {<br>
+          constructor(name) {<br>
+            this.name = name;<br>
+          }<br>
+        }
+        <h4>NOTE: no semicolon after a class export in the same way a function never has one after.</h4>
+    </p>
+
+    <p><h3>Export declaration can come before or after the functions - doesn't have to be part of the declaration as in the above examples</h3>
+      function sayHi(user) {<br>
+        alert(`Hello, ${user}!`);<br>
+      }<br><br>
+      function sayBye(user) {<br>
+        alert(`Bye, ${user}!`);<br>
+      }<br><br>
+      export {sayHi, sayBye}; // a list of exported variables<br><br>
+
+    <h3>Use an alias to export as...</h3>
+    export {sayHi as hi, sayBye as bye};<br>
+    Now hi and bye are official names for outsiders, to be used in imports:<br><br>
+    import * as say from './say.js';<br><br>
+    say.hi('John'); // Hello, John!<br>
+    say.bye('John'); // Bye, John!<br>
+    </p>
+
+    <p><h1>Import</h1>
+    <h3>Put the functions to import inside curly braces:</h3>
+    import {sayHi, sayBye} from './say.js';<br><br>
+    sayHi('John'); // Hello, John!<br>
+    sayBye('John'); // Bye, John!<br><br>
+
+    <h3>Import everything as an object using import * as ...</h3>
+    import * as say from './say.js';<br><br>
+    say.sayHi('John');<br>
+    say.sayBye('John');<br><br>
+    This is not always a good idea because explicitly listing what to import gives shorter names: sayHi() instead of say.sayHi().<br>
+    Also, an explicit list of imports gives better overview of the code structure: what is used and where. It makes code support and refactoring easier.<br><br>
+
+    <h3>Use as to import under different names.</h3>
+    import {sayHi as hi, sayBye as bye} from './say.js';<br><br>
+    hi('John'); // Hello, John!<br>
+    bye('John'); // Bye, John!<br>
+    
+
+
+</p>
     
 </body>
 </html>
