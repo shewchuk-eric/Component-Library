@@ -19,7 +19,7 @@
             this.name = name;<br>
           }<br>
         }
-        <h4>NOTE: no semicolon after a class export in the same way a function never has one after.</h4>
+        <h4>NOTE: no semicolon after a class export in the same way a function never has one after.</h4><br>
     </p>
 
     <p><h3>Export declaration can come before or after the functions - doesn't have to be part of the declaration as in the above examples</h3>
@@ -30,13 +30,14 @@
         alert(`Bye, ${user}!`);<br>
       }<br><br>
       export {sayHi, sayBye}; // a list of exported variables<br><br>
+    </p>
 
-    <h3>Use an alias to export as...</h3>
+    <p><h3>Use an alias to export as...</h3>
     export {sayHi as hi, sayBye as bye};<br>
     Now hi and bye are official names for outsiders, to be used in imports:<br><br>
     import * as say from './say.js';<br><br>
     say.hi('John'); // Hello, John!<br>
-    say.bye('John'); // Bye, John!<br>
+    say.bye('John'); // Bye, John!<br><br>
     </p>
 
     <p><h1>Import</h1>
@@ -44,22 +45,64 @@
     import {sayHi, sayBye} from './say.js';<br><br>
     sayHi('John'); // Hello, John!<br>
     sayBye('John'); // Bye, John!<br><br>
+    </p>
 
-    <h3>Import everything as an object using import * as ...</h3>
+    <p><h3>Import everything as an object using import * as ...</h3>
     import * as say from './say.js';<br><br>
     say.sayHi('John');<br>
     say.sayBye('John');<br><br>
     This is not always a good idea because explicitly listing what to import gives shorter names: sayHi() instead of say.sayHi().<br>
     Also, an explicit list of imports gives better overview of the code structure: what is used and where. It makes code support and refactoring easier.<br><br>
+    </p>
 
-    <h3>Use as to import under different names.</h3>
+    <p><h3>Use as to import under different names.</h3>
     import {sayHi as hi, sayBye as bye} from './say.js';<br><br>
     hi('John'); // Hello, John!<br>
-    bye('John'); // Bye, John!<br>
+    bye('John'); // Bye, John!<br><br>
+    </p>
     
+    <p><h3>Export as Default</h3>
+    Create modules that are a fully self-contained class make code navigation much cleaner. **Results in more files but is easier to understand**<br><br>
+    export default class User { // just add "default"<br>
+    constructor(name) {<br>
+    this.name = name;<br>
+    }<br>
+    }<br><br>
+    <em>There may be only one export default per file.</em><br>
+    …And then import it without curly braces:<br><br>
+    import User from './user.js'; // not {User}, just User<br><br>
+    new User('John');<br><br>
+    ** Remember, import needs curly braces for named exports and doesn't need them for the default one.<br><br>
+    </p>
 
-
-</p>
-    
+    <p><h3>When a file contains a default and named export</h3>
+    A module exports one main “default” thing, and a few named ones (rarely the case, but it happens):<br><br>
+    export default class User {<br>
+      constructor(name) {<br>
+        this.name = name;<br>
+      }<br>
+    }<br><br>
+    export function sayHi(user) {<br>
+      alert(`Hello, ${user}!`);<br>
+    }<br><br>
+    <h4>Import the default export along with a named one:</h4><br>
+    import {default as User, sayHi} from './user.js';<br><br>
+    new User('John');<br><br>
+    <h4>Import everything * as an object - the default property is exactly the default export:</h4><br>
+    import * as user from './user.js';<br><br>
+    let User = user.default; // the default export<br>
+    new User('John');<br><br>
+    <h4>Use caution with the names of default exports</h4><br>
+    Named exports are explicit. They exactly name what they import, so we have that information from them; that's a good thing.<br>
+    With default export, we always choose the name when importing:<br>
+    import User from './user.js'; // works<br>
+    import MyUser from './user.js'; // works too<br>
+    // could be import Anything... and it'll still work<br><br>
+    So there's a rule that imported variables should correspond to file names, e.g:<br>
+    import User from './user.js';<br>
+    import LoginForm from './loginForm.js';<br>
+    import func from '/path/to/func.js';<br>
+    ...<br><br>
+  </p>
 </body>
 </html>
