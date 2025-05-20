@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rest and Spread</title>
+    <style>
+        code 
+            {color: blue;}
+    </style>
+</head>
+<body>
+    <p>
+    <h1>Rest parameters and spread syntax</h1>
+    Many JavaScript built-in functions support an arbitrary number of arguments. For instance:<br>
+    <ul>
+    <li><code>Math.max(arg1, arg2, ..., argN)</code> – returns the greatest of the arguments.</li>
+    <li><code>Object.assign(dest, src1, ..., srcN)</code> – copies properties from <code>src1..N</code> into <code>dest</code></li>
+    <li>…and so on.</li></ul>
+
+    <h2>Rest parameters ...</h2>
+    A function can be called with any number of arguments, no matter how it is defined. Like here:<br><br>
+    <code>
+    function sum(a, b) {<br>
+    return a + b;<br>
+    }<br><br>
+    alert( sum(1, 2, 3, 4, 5) );</code><br><br>
+    There will be no error because of “excessive” arguments. But of course in the result only the first two will be counted, so the result<br>
+    in the code above is "3". The rest of the parameters can be included in the function definition by using three dots ... followed by the<br>
+    name of the array that will contain them. The dots literally mean “gather the remaining parameters into an array”.<br>
+    For instance, to gather all arguments into array args:<br><br>
+    <code>function sumAll(...args) { // args is the name for the array<br>
+    let sum = 0;<br>
+    for (let arg of args) sum += arg;<br>
+    return sum;<br>
+    }<br><br>
+    alert( sumAll(1) ); // 1<br>
+    alert( sumAll(1, 2) ); // 3<br>
+    alert( sumAll(1, 2, 3) ); // 6</code><br><br>
+    We can choose to get the first parameters as variables, and gather only the rest.<br>
+    Here the first two arguments go into variables and the rest go into titles array:<br><br>
+    <code>function showName(firstName, lastName, ...titles) {<br>
+    alert( firstName + ' ' + lastName ); // Julius Caesar<br><br>
+    // the rest go into titles array<br>
+    // i.e. titles = ["Consul", "Imperator"]<br>
+    alert( titles[0] ); // Consul<br>
+    alert( titles[1] ); // Imperator<br>
+    alert( titles.length ); // 2<br>
+    }<br><br>
+    showName("Julius", "Caesar", "Consul", "Imperator");</code><br><br>
+    <strong>The rest parameters must be at the end!</strong>The rest parameters gather all remaining arguments, so the following does not make sense and causes an error:<br><br>
+    <code>function f(arg1, ...rest, arg2) { // arg2 after ...rest ?!<br>
+    // error<br>
+    }</code><br><br>
+
+    <h2>The “arguments” variable</h2>
+    There is also a special array-like object named arguments that contains all arguments by their index. For instance:<br><br>
+    <code>
+    function showName() {<br>
+    alert( arguments.length );<br>
+    alert( arguments[0] );<br>
+    alert( arguments[1] );<br>
+    // it's iterable<br>
+    // for(let arg of arguments) alert(arg);<br>
+    }<br><br>
+    // shows: 2, Julius, Caesar<br>
+    showName("Julius", "Caesar");<br><br>
+
+    // shows: 1, Ilya, undefined (no second argument)<br>
+    showName("Ilya");</code><br><br>
+
+
+    <h2>Spread syntax</h2>
+    Spread syntax looks similar to rest parameters, also using ..., but does quite the opposite. When ...arr is used in the<br>
+    function call, it “expands” an iterable object arr into the list of arguments. For Math.max:<br><br>
+    <code>let arr = [3, 5, 1];<br>
+    alert( Math.max(...arr) ); // 5 (spread turns array into a list of arguments)</code><br><br>
+    We also can pass multiple iterables this way:<br><br>
+    <code>let arr1 = [1, -2, 3, 4];<br>
+    let arr2 = [8, 3, -8, 1];<br>
+    alert( Math.max(...arr1, ...arr2) ); // 8</code><br><br>
+    We can even combine the spread syntax with normal values:<br><br>
+    <code>let arr1 = [1, -2, 3, 4];<br>
+    let arr2 = [8, 3, -8, 1];<br>
+    alert( Math.max(1, ...arr1, 2, ...arr2, 25) ); // 25</code><br><br>
+    Also, the spread syntax can be used to merge arrays:<br><br>
+    <code>let arr = [3, 5, 1];<br>
+    let arr2 = [8, 9, 15];<br>
+    let merged = [0, ...arr, 2, ...arr2];<br>
+    alert(merged); // 0,3,5,1,2,8,9,15 (0, then arr, then 2, then arr2)</code><br><br>
+    In the examples above we used an array to demonstrate the spread syntax, but any iterable will do. For instance, here we use the<br>
+    spread syntax to turn the string into array of characters:<br><br>
+    <code>let str = "Hello";<br>
+    alert( [...str] ); // H,e,l,l,o</code><br><br>
+    The spread syntax internally uses iterators to gather elements, the same way as <code>for..of does</code>. So, for a string, <code>for..of</code><br>
+    returns characters and <code>...str</code> becomes <code>"H","e","l","l","o"</code>. The list of characters is passed to array initializer <code>[...str]</code>.<br>
+    For this particular task we could also use Array.from, because it converts an iterable (like a string) into an array:<br><br>
+    <code>let str = "Hello";<br>
+    // Array.from converts an iterable into an array<br>
+    alert( Array.from(str) ); // H,e,l,l,o</code><br><br>
+    The result is the same as <code>[...str]</code>. But there’s a subtle difference between <code>Array.from(obj)</code> and <code>[...obj]</code>:<br><br>
+    <code>Array.from</code> operates on both array-likes and iterables. The spread syntax works only with iterables. So, for the task of turning<br>
+    something into an array, <code>Array.from</code> tends to be more universal.<br><br>
+
+
+    <h2>Copy an array/object</h2>
+    Remember when we talked about <code>Object.assign()</code> in the past? It is possible to do the same thing with the spread syntax.<br><br>
+    <code>let arr = [1, 2, 3];<br>
+    let arrCopy = [...arr]; // spread the array into a list of parameters<br>
+                            // then put the result into a new array<br><br>
+    // do the arrays have the same contents?<br>
+    alert(JSON.stringify(arr) === JSON.stringify(arrCopy)); // true<br><br>
+    // are the arrays equal?<br>
+    alert(arr === arrCopy); // false (not same reference)<br><br>
+    // modifying our initial array does not modify the copy:<br>
+    arr.push(4);<br>
+    alert(arr); // 1, 2, 3, 4<br>
+    alert(arrCopy); // 1, 2, 3</code><br><br>
+    Note that it is possible to do the same thing to make a copy of an object:<br><br>
+    <code>let obj = { a: 1, b: 2, c: 3 };<br>
+    let objCopy = { ...obj }; // spread the object into a list of parameters<br>
+                            // then return the result in a new object<br><br>
+    // do the objects have the same contents?<br>
+    alert(JSON.stringify(obj) === JSON.stringify(objCopy)); // true<br><br>
+    // are the objects equal?<br>
+    alert(obj === objCopy); // false (not same reference)<br><br>
+    // modifying our initial object does not modify the copy:<br>
+    obj.d = 4;<br>
+    alert(JSON.stringify(obj)); // {"a":1,"b":2,"c":3,"d":4}<br>
+    alert(JSON.stringify(objCopy)); // {"a":1,"b":2,"c":3}</code><br><br>
+    This way of copying an object is much shorter than <code>let objCopy = Object.assign({}, obj)</code> or for an array <code>let arrCopy = Object.assign([], arr)</code> so we prefer to use it whenever we can.<br><br>
+
+
+    <h2>Summary</h2>
+    When we see <code>"..."</code> in the code, it is either rest parameters or the spread syntax. There’s an easy way to distinguish between them:<br>
+
+    <ul>
+    <li>When <code>...</code> is at the end of function parameters, it’s “rest parameters” and gathers the rest of the list of arguments into an array.</li>
+    <li>When <code>...</code> occurs in a function call or alike, it’s called a “spread syntax” and expands an array into a list.</li></ul>
+    Use patterns:<br>
+
+    <ul>
+    <li>Rest parameters are used to create functions that accept any number of arguments.</li>
+    <li>The spread syntax is used to pass an array to functions that normally require a list of many arguments.</li></ul>
+    </p>
+</body>
+</html>
