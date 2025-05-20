@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fetch</title>
+</head>
+<body>
+    <p>
+        <h1>Fetch</h1>
+        Use <code>fetch()</code> to send requests for information to the network.<br><br>
+        Syntax: <code>let promise = fetch(url, [options])</code><br>
+        <code>url</code> - where the information is located.<br>
+        <code>options</code> - options include <em>method, header, etc.</em><br><br>
+        If no options are given then it becomes a GET request and will simply retrieve whatever it finds at the url.<br><br>
+        Getting a response is usually a two-stage process.<br>
+        <strong>First, the promise, returned by fetch, resolves with an object of the built-in Response class as soon<br>
+        as the server responds with headers.</strong><br>
+        The promise rejects if the fetch was unable to make HTTP-request, e.g. network problems, or there’s no such site.<br>
+        <em>Abnormal HTTP-statuses, such as 404 or 500 do not cause an error.</em><br><br>
+        We can see HTTP-status in response properties:<br>
+        <code>status</code> – HTTP status code, e.g. 200.<br>
+        <code>ok</code> – boolean, true if the HTTP status code is 200-299.<br>
+        For example:<br><br>
+        <code>let response = await fetch(url);<br>
+        if (response.ok) { // if HTTP-status is 200-299<br>
+        // get the response body (the method explained below)<br>
+        let json = await response.json();<br>
+        } else {<br>
+        alert("HTTP-Error: " + response.status);<br>
+        }<br><br>
+        <strong>Second, to get the response body, we need to use an additional method call.</strong><br><br>
+        Response provides multiple promise-based methods to access the body in various formats:<br>
+        <ul>
+            <li><code>response.text()</code> – read the response and return as text</li>
+            <li><code>response.json()</code> – parse the response as JSON</li>
+            <li><code>response.formData()</code> – return the response as FormData object (explained in the next chapter)</li>
+            <li><code>response.blob()</code> – return the response as Blob (binary data with type)</li>
+            <li><code>response.arrayBuffer()</code> – return the response as ArrayBuffer (low-level representation of binary data)</li>
+            <li>additionally, <code>response.body</code> is a ReadableStream object, it allows you to read the body chunk-by-chunk</li>
+        </ul>
+        For instance, let’s get a JSON-object with latest commits from GitHub:<br><br>
+        <code>let url = 'https://api.github.com/repos/javascript-tutorial/en.javascript.info/commits';<br>
+        let response = await fetch(url);<br>
+        let commits = await response.json(); // read response body and parse as JSON<br>
+        alert(commits[0].author.login);</code><br><br>
+        To get the response text, <code>await response.text()</code> instead of <code>.json()</code>:<br><br>
+        <code>let response = await fetch('https://api.github.com/repos/javascript-tutorial/en.javascript.info/commits');<br>
+        let text = await response.text(); // read response body as text<br>
+        alert(text.slice(0, 80) + '...');</code><br><br>
+        As a show-case for reading in binary format, let’s fetch and show a logo image of “fetch” specification:<br><br>
+        <code>let response = await fetch('/article/fetch/logo-fetch.svg');<br>
+        let blob = await response.blob(); // download as Blob object<br><br>
+        // create img tag for it<br>
+        let img = document.createElement('img');<br>
+        img.style = 'position:fixed;top:10px;left:10px;width:100px';<br>
+        document.body.append(img);<br><br>
+        // show it<br>
+        img.src = URL.createObjectURL(blob);<br><br>
+        setTimeout(() => { // hide after three seconds<br>
+        img.remove();<br>
+        URL.revokeObjectURL(img.src);<br>
+        }, 3000);</code><br><br>
+
+
+        <h2>Response headers</h2>
+        The response headers are available in a Map-like headers object in response.headers and has similar methods to get<br>
+        individual headers by name or iterate over them:<br><br>
+        <code>let response = await fetch('https://api.github.com/repos/javascript-tutorial/en.javascript.info/commits');<br><br>
+        // get one header<br>
+        alert(response.headers.get('Content-Type')); // application/json; charset=utf-8<br><br>
+        // iterate over all headers<br>
+        for (let [key, value] of response.headers) {<br>
+        alert(`${key} = ${value}`);<br>
+        }</code><br><br>
+        <h2>Request headers</h2>
+        To set a request header in fetch, we can use the headers option. It has an object with outgoing headers, like this:<br><br>
+        <code>let response = fetch(protectedUrl, {<br>
+        headers: {<br>
+            Authentication: 'secret'<br>
+        }<br>
+        });</code><br><br>
+
+
+        <h2>POST requests</h2>
+        To make a POST request, or a request with another method, we need to use fetch options:<br><br>
+        <ul><li><code>method</code> – HTTP-method, e.g. POST</li>
+            <li><code>body</code> – the request body, one of:
+                <ul>
+                <li>a string (e.g. JSON-encoded)</li>
+                <li><code>FormData</code> object, to submit the data as <code>multipart/form-data</code></li>
+                <li><code>Blob/BufferSource</code> to send binary data</li>
+                <li>URLSearchParams, to submit the data in <code>x-www-form-urlencoded</code> encoding, rarely used</li>
+                </ul>
+            </ul>
+        The JSON format is used most of the time. For example, this code submits user object as JSON:<br><br>
+        <code>let user = {<br>
+        name: 'John',<br>
+        surname: 'Smith'<br>
+        };<br><br>
+        let response = await fetch('/article/fetch/post/user', {<br>
+        method: 'POST',<br>
+        headers: {<br>
+            'Content-Type': 'application/json;charset=utf-8'<br>
+        },<br>
+        body: JSON.stringify(user)<br>
+        });<br><br>
+        let result = await response.json();<br>
+        alert(result.message);</code><br><br>
+        <strong>Please note</strong>, if the request body is a string, then Content-Type header is set to text/plain;charset=UTF-8 by default.<br>
+        But, as we’re going to send JSON, we use headers option to send application/json instead, the correct Content-Type for JSON-encoded data.<br><br>
+
+
+        <h2>Sending an image</h2>
+        We can also submit binary data with fetch using Blob or BufferSource objects.<br>
+        In this example, there’s a &lt;canvas> where we can draw by moving a mouse over it. A click on the “submit” button sends the image to the server:<br><br>
+        <code>&lt;body style="margin:0"><br>
+        &lt;canvas id="canvasElem" width="100" height="80" style="border:1px solid">&lt;/canvas><br><br>
+        &lt;input type="button" value="Submit" onclick="submit()"><br><br>
+        &lt;script><br>
+            <code>canvasElem.onmousemove = function(e) {<br>
+            let ctx = canvasElem.getContext('2d');<br>
+            ctx.lineTo(e.clientX, e.clientY);<br>
+            ctx.stroke();<br>
+            };<br><br>
+            async function submit() {<br>
+            let blob = await new Promise(resolve => canvasElem.toBlob(resolve, 'image/png'));<br>
+            let response = await fetch('/article/fetch/post/image', {<br>
+                method: 'POST',<br>
+                body: blob<br>
+            });<br><br>
+            // the server responds with confirmation and the image size<br>
+            let result = await response.json();<br>
+            alert(result.message);<br>
+            }</code><br><br>
+        &lt;/script><br>
+        &lt;/body><br><br>
+        
+        
+        <h2>Summary</h2>
+        A typical fetch request consists of two await calls:<br><br>
+        <code>let response = await fetch(url, options); // resolves with response headers<br>
+        let result = await response.json(); // read body as json</code><br><br>
+
+        Response properties:<br>
+        <ul>
+        <li><code>response.status</code> – HTTP code of the response</li>
+        <li><code>response.ok</code> – true if the status is 200-299</li>
+        <li><code>response.headers</code> – Map-like object with HTTP headers</li>
+        </ul>
+        Methods to get response body:
+        <ul>
+        <li><code>response.text() – return the response as text</li>
+        <li><code>response.json()</code> – parse the response as JSON object</li>
+        <li><code>response.formData()</code> – return the response as FormData object (multipart/form-data encoding, see the next chapter)</li>
+        <li><code>response.blob()</code> – return the response as Blob (binary data with type)</li>
+        <li><code>response.arrayBuffer()</code> – return the response as ArrayBuffer (low-level binary data)</li>
+        </ul>
+        Fetch options so far:
+        <ul>
+        <li><code>method</code> – HTTP-method</code></li>
+        <li><code>headers</code> – an object with request headers (not any header is allowed)</li>
+        <li><code>body</code> – the data to send (request body) as string, FormData, BufferSource, Blob or UrlSearchParams object</li>
+        </ul>
+    <a href="https://javascript.info/fetch" target="_blank">Go to tutorial online</a>
+    </p>
+</body>
+</html>

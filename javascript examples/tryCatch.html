@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error Handling</title>
+</head>
+<body>
+    <p>
+        <h1>Error Handling</h1>
+        <h3>Using Try...Catch</h3>
+        It works like this:
+        <ol>
+            <li>First, the code in try {...} is executed.</li>
+            <li>If there were no errors, then catch (err) is ignored: the execution reaches the end of try and goes on, skipping catch.</li>
+            <li>If an error occurs, then the try execution is stopped, and control flows to the beginning of catch (err). The err variable (we can use any name for it) will contain an error object with details about what happened.</li>
+        </ol><br>
+
+        Example without errors:<br><br>
+        <code>try {<br>
+            alert('Start of try runs');  // (1)<br>
+            // ...no errors here so code continues to run<br>
+            alert('End of try runs');   // (2)<br>
+            } catch (err) {<br>
+                alert('Catch is ignored, because there are no errors'); // (3)<br>
+                }<br><br><br>
+        </code>
+
+        Example with an error:<br><br>
+        <code>try {<br>
+            alert('Start of try runs');  // (1)<br>
+            lalala; // error, variable is not defined! Code stops and is sent to the catch below<br>
+            alert('End of try (never reached)');  // (2)<br>
+         } catch (err) {<br>
+            alert(`Error has occurred!`); // (3)<br>
+            }<br><br>
+        </code>
+
+        <h3>Try...Catch is synchronous!</h3>
+        If an exception happens in “scheduled” code, like in setTimeout, then try...catch won’t catch it:<br><br>
+        <code>try {<br>
+            setTimeout(function() {<br>
+                noSuchVariable; // script will die here<br>
+                }, 1000);<br>
+                } catch (err) {<br>
+                    alert( "won't work" );<br>
+                }<br><br>
+        </code>
+
+        That’s because the function itself is executed later, when the engine has already left the try...catch construct.<br>
+        To catch an exception inside a scheduled function, try...catch must be inside that function:<br><br>
+        <code>setTimeout(function() {<br>
+            try {<br>
+                noSuchVariable; // try...catch handles the error!<br>
+                } catch {<br>
+                    alert( "error is caught here!" );<br>
+                    }<br>
+                    }, 1000);<br><br>
+        </code>
+
+        <h3>Error object</h3>
+        When an error occurs, JavaScript generates an object containing the details about it. The object is then passed as an argument to catch:<br><br>
+        <code>try {<br>
+            // ...<br>
+            } catch (err) { // the "error object", could use another word instead of err<br>
+            // ...<br>
+            }<br><br>
+        </code>
+        For all built-in errors, the error object has two main properties:<br>
+        <strong>name</strong><br>
+        Error name. For instance, for an undefined variable that’s "ReferenceError".<br>
+        <strong>message</strong><br>
+        Textual message about error details.<br><br>
+        There are other non-standard properties available in most environments. One of most widely used and supported is:
+        <strong>stack</strong><br>
+        Current call stack: a string with information about the sequence of nested calls that led to the error. Used for debugging purposes.<br>
+        For instance:<br><br>
+        <code>try {<br>
+            lalala; // error, variable is not defined!<br>
+            } catch (err) {<br>
+                alert(err.name); // ReferenceError<br>
+                alert(err.message); // lalala is not defined<br>
+                alert(err.stack); // ReferenceError: lalala is not defined at (...call stack)<br>
+                // Can also show an error as a whole<br>
+                // The error is converted to string as "name: message"<br>
+                alert(err); // ReferenceError: lalala is not defined<br>
+                }<br><br>
+        </code>
+
+        <h3>“Throw” operator</h3>
+        The throw operator generates an error.<br>
+        The syntax is:<br><br>
+        throw <code>&lt;error object&gt;</code><br><br>
+        Technically, we can use anything as an error object. That may be even a primitive, like a number or a string, but it’s better to use objects, preferably with name and<br>
+        message properties (to stay somewhat compatible with built-in errors).<br>
+        JavaScript has many built-in constructors for standard errors: Error, SyntaxError, ReferenceError, TypeError and others. We can use them to create error objects as well.<br>
+        Their syntax is:<br><br>
+        <code>let error = new Error(message);<br>
+        // or<br>
+        let error = new SyntaxError(message);<br>
+        let error = new ReferenceError(message);<br>
+        // ...<br><br>
+        </code>
+        For built-in errors (not for any objects, just for errors), the name property is exactly the name of the constructor. And message is taken from the argument.<br>
+        For instance:<br><br>
+        <code>let error = new Error("Things happen o_O");<br>
+        alert(error.name); // Error<br>
+        alert(error.message); // Things happen o_O<br><br>
+        </code>
+
+        <h3>Full Code Example Using Try...Catch...Throw</h3>
+        <code>
+        let json = '{ "age": 30 }'; // incomplete data<br>
+        try {<br>
+        let user = JSON.parse(json); // no errors<br>
+        if (!user.name) {<br>
+            throw new SyntaxError("Incomplete data: no name"); // (*)<br>
+        }<br>
+        alert( user.name );<br>
+        } catch (err) {<br>
+        alert( "JSON Error: " + err.message ); // JSON Error: Incomplete data: no name<br>
+        }<br><br>
+        </code>
+
+        <h3>Rethrowing</h3>
+        try...catch, as shown above, can be told to look for specific errors. But what if an error appears that isn't the type we're looking for?<br>
+        To avoid such problems, we can employ the “rethrowing” technique. The rule is simple:<br><br>
+        <strong>Catch should only process errors that it knows and “rethrow” all others.</strong><br>
+        The “rethrowing” technique can be explained in more detail as:<br>
+        <ol>
+            <li>Catch gets all errors.</li>
+            <li>In the catch (err) {...} block we analyze the error object err.</li>
+            <li>If we don’t know how to handle it, we do throw err.</li>
+        </ol>
+        
+        <h4>Handle Multiple Errors</h4>
+        <code>function readData() {<br>
+        let json = '{ "age": 30 }';<br>
+        try {<br>
+            // ...<br>
+            blabla(); // error!<br>
+        } catch (err) {<br>
+            // ...<br>
+            if (!(err instanceof SyntaxError)) {<br>
+            throw err; // rethrow (don't know how to deal with it)<br>
+            }<br>
+        }<br>
+        }<br>
+        try {<br>
+        readData();<br>
+        } catch (err) {<br>
+        alert( "External catch got: " + err ); // caught it!<br>
+        }<br><br>
+        Here readData only knows how to handle SyntaxError, while the outer try...catch knows how to handle everything.<br><br>
+        
+        <h3>try…catch…finally</h3>
+        Wait, that’s not all.<br>
+        The try...catch construct may have one more code clause: <strong>finally.</strong><br>
+        If it exists, it runs in all cases:<br>
+        &emsp;after try, if there were no errors,<br>
+        &emsp;after catch, if there were errors.<br>
+        The extended syntax looks like this:<br><br>
+        <code>try {<br>
+        ... try to execute the code ...<br>
+        } catch (err) {<br>
+        ... handle errors ...<br>
+        } finally {<br>
+        ... execute always ...<br>
+        }<br><br>
+        </code>
+<br><br><br>
+    <a href="https://javascript.info/try-catch" target="_blank">Learn more online</a>
+    </p>
+</body>
+</html>

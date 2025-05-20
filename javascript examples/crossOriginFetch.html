@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cross Origin Requests</title>
+    <style>
+        code 
+            {color: blue;}
+    </style>
+</head>
+<body>
+    <p>
+<h1>Cross Origin Requests</h1>
+Requests from one web site to another require an explicit allowance by the server, expressed in special headers.<br>
+
+<h2>Safe requests</h2>
+There are two types of cross-origin requests:<br><br>
+Safe requests.
+All the others.<br><br>
+A request is safe if it satisfies two conditions:<br><br>
+<ol><li>Safe method: GET, POST or HEAD</li>
+<li>Safe headers – the only allowed custom headers are:<ul>
+<li>Accept</li>
+<li>Accept-Language</li>
+<li>Content-Language</li>
+<li>Content-Type with the value application/x-www-form-urlencoded, multipart/form-data or text/plain.</li></ul></ol>
+Any other request is considered “unsafe”. For instance, a request with PUT method or with an API-Key HTTP-header does not fit the limitations.<br>
+The essential difference is that <strong>a safe request can be made with a &lt;form> or a &lt;script>, without any special methods.</strong><br><br>
+
+When we try to make a unsafe request, the browser sends a special “preflight” request that asks the server – does it agree to accept<br>
+such cross-origin requests, or not? And, unless the server explicitly confirms that with headers, an unsafe request is not sent.<br>
+<h2>CORS for safe requests</h2>
+If a request is cross-origin, the browser always adds the Origin header to it.<br>
+For instance, if we request https://anywhere.com/request from https://javascript.info/page, the headers will look like:<br><br>
+<code>GET /request<br>
+Host: anywhere.com<br>
+Origin: https://javascript.info<br>
+...</code><br><br>
+The Origin header contains exactly the origin (domain/protocol/port), without a path.<br>
+The server can inspect the Origin and, if it agrees to accept such a request, add a special header Access-Control-Allow-Origin to the response.<br>
+That header should contain the allowed origin (in our case https://javascript.info), or a star *. Then the response is successful, otherwise it’s an error.<br><br>
+The browser plays the role of a trusted mediator here:<br><br>
+1. It ensures that the correct Origin is sent with a cross-origin request.<br>
+2. It checks for permitting Access-Control-Allow-Origin in the response, if it exists, then JavaScript is allowed to access the response, otherwise it fails with an error.<br><br>
+Here’s an example of a permissive server response:<br><br>
+<code>200 OK<br>
+Content-Type:text/html; charset=UTF-8<br>
+Access-Control-Allow-Origin: https://javascript.info</code><br><br>
+
+
+<h2>Response headers</h2>
+For cross-origin request, by default JavaScript may only access so-called “safe” response headers:<br>
+<ul>
+<li><code>Cache-Control</code></li>
+<li><code>Content-Language</code></li>
+<li><code>Content-Length</code></li>
+<li><code>Content-Type</code></li>
+<li><code>Expires</code></li>
+<li><code>Last-Modified</code></li>
+<li><code>Pragma</code></li>
+</ul>
+Accessing any other response header causes an error.<br>
+To grant JavaScript access to any other response header, the server must send the Access-Control-Expose-Headers header. It contains a comma-separated list of<br>
+unsafe header names that should be made accessible. For example:<br><br>
+<code>200 OK<br>
+Content-Type:text/html; charset=UTF-8<br>
+Content-Length: 12345<br>
+Content-Encoding: gzip<br>
+API-Key: 2c9de507f2c54aa1<br>
+Access-Control-Allow-Origin: https://javascript.info<br>
+Access-Control-Expose-Headers: Content-Encoding,API-Key</code><br><br>
+With such an Access-Control-Expose-Headers header, the script is allowed to read the Content-Encoding and API-Key headers of the response.<br><br>
+
+
+<h2>“Unsafe” requests</h2>
+We can use any HTTP-method: not just GET/POST, but also PATCH, DELETE and others.<br>
+To avoid misunderstandings, any “unsafe” request will be held by the browser until it first sends a preliminary, so-called “preflight”<br>
+request, to ask for permission. A preflight request uses the method OPTIONS, no body and three headers:<br><br>
+<ul>
+<li><code>Access-Control-Request-Method</code> header has the method of the unsafe request</li>
+<li><code>Access-Control-Request-Headers</code> header provides a comma-separated list of its unsafe HTTP-headers</li>
+<li><code>Origin</code> header tells from where the request came. (such as https://javascript.info)</li>
+</ul>
+If the server agrees to serve the requests, then it should respond with empty body, status 200 and headers:
+<ul>
+<li><code>Access-Control-Allow-Origin</code> must be either <code>*</code> or the requesting origin, such as https://javascript.info, to allow it</li>
+<li><code>Access-Control-Allow-Methods</code> must have the allowed method</li>
+<li><code>Access-Control-Allow-Headers</code> must have a list of allowed headers</li>
+<li>Additionally, the header <code>Access-Control-Max-Age</code> may specify a number of seconds to cache the permissions. So the browser won’t have to send a preflight for subsequent requests that satisfy given permissions</li>
+</ul>
+
+Step-by-step on the example of a cross-origin PATCH request (this method is often used to update data):<br><br>
+<code>let response = await fetch('https://site.com/service.json', {<br>
+  method: 'PATCH',<br>
+  headers: {<br>
+    'Content-Type': 'application/json',<br>
+    'API-Key': 'secret'<br>
+  }<br>
+});</code><br><br>
+There are three reasons why the request is unsafe (one is enough):<br><br>
+<ul>
+<li>Method PATCH</li>
+<li>Content-Type is not one of: application/x-www-form-urlencoded, multipart/form-data, text/plain</li>
+<li>“Unsafe” API-Key header</li>
+</ul>
+
+<h3>Step 1 (preflight request)</h3>
+Prior to sending such a request, the browser, on its own, sends a preflight request that looks like this:
+<code>OPTIONS /service.json<br>
+Host: site.com<br>
+Origin: https://javascript.info<br>
+Access-Control-Request-Method: PATCH<br>
+Access-Control-Request-Headers: Content-Type,API-Key</code><br><br>
+<ul>
+<li>Method: <code>OPTIONS</code></li>
+<li>The path – exactly the same as the main request: <code>/service.json</code></li>
+<li>Cross-origin special headers:<ul>
+<li><code>Origin</code> – the source origin.</li>
+<li><code>Access-Control-Request-Method</code> – requested method.</li>
+<li><code>Access-Control-Request-Headers</code> – a comma-separated list of “unsafe” headers.</li></li>
+</ul></ul>
+
+<h3>Step 2 (preflight response)</h3>
+The server should respond with status 200 and the headers:<br>
+<ul>
+<li><code>Access-Control-Allow-Origin: https://javascript.info</code></li>
+<li><code>Access-Control-Allow-Methods: PATCH</code></li>
+<li><code>Access-Control-Allow-Headers: Content-Type,API-Key.</code></li>
+</ul>
+That allows future communication, otherwise an error is triggered. If the server expects other methods and headers in the future, it<br>
+makes sense to allow them in advance by adding them to the list. For example, this response also allows PUT, DELETE and additional headers:<br><br>
+<code>200 OK<br>
+Access-Control-Allow-Origin: https://javascript.info<br>
+Access-Control-Allow-Methods: PUT,PATCH,DELETE<br>
+Access-Control-Allow-Headers: API-Key,Content-Type,If-Modified-Since,Cache-Control<br>
+Access-Control-Max-Age: 86400</code><br><br>
+Now the browser can see that PATCH is in Access-Control-Allow-Methods and Content-Type,API-Key are in the list Access-Control-Allow-Headers, so<br>
+it sends out the main request. If there’s the header Access-Control-Max-Age with a number of seconds, then the preflight permissions are cached<br>
+for the given time. The response above will be cached for 86400 seconds (one day). Within this timeframe, subsequent requests will not cause a<br>
+preflight. Assuming that they fit the cached allowances, they will be sent directly.
+
+<h3>Step 3 (actual request)</h3>
+When the preflight is successful, the browser now makes the main request. The process here is the same as for safe requests.<br>
+The main request has the Origin header (because it’s cross-origin):<br><br>
+<code>PATCH /service.json<br>
+Host: site.com<br>
+Content-Type: application/json<br>
+API-Key: secret<br>
+Origin: https://javascript.info</code><br><br>
+
+<h3>Step 4 (actual response)</h3>
+The server should not forget to add Access-Control-Allow-Origin to the main response. A successful preflight does not relieve from that:<br><br>
+<code>Access-Control-Allow-Origin: https://javascript.info</code><br><br>
+
+
+<h2>Credentials</h2>
+A cross-origin request initiated by JavaScript code by default does not bring any credentials (cookies or HTTP authentication). Usually, a request<br>
+to http://site.com is accompanied by all cookies from that domain. Cross-origin requests made by JavaScript methods on the other hand are an exception.<br>
+A request with credentials is much more powerful than without them. If allowed, it grants JavaScript the full power to act on behalf of the user and<br>
+access sensitive information using their credentials. Does the server really trust the script that much? Then it must explicitly allow requests with<br>
+credentials with an additional header. To send credentials in fetch, we need to add the option credentials: "include", like this:<br><br>
+<code>fetch('http://another.com', {<br>
+  credentials: "include"<br>
+});</code><br><br>
+Now fetch sends cookies originating from another.com with request to that site. If the server agrees to accept the request with credentials, it should<br>
+add a header Access-Control-Allow-Credentials: true to the response, in addition to Access-Control-Allow-Origin. For example:<br><br>
+<code>200 OK<br>
+Access-Control-Allow-Origin: https://javascript.info<br>
+Access-Control-Allow-Credentials: true</code><br><br>
+Please note: Access-Control-Allow-Origin is prohibited from using a star * for requests with credentials. Like shown above, it must provide the exact<br>
+origin there. That’s an additional safety measure, to ensure that the server really knows who it trusts to make such requests.<br><br>
+
+
+<h2>Summary</h2>
+“Safe” requests must satisfy the following conditions:<br><br>
+<ul>
+<li>Method: GET, POST or HEAD.</li>
+<li>Headers – we can set only:<ul>
+<li><code>Accept</li></code>
+<li><code>Accept-Language</code></li>
+<li><code>Content-Language</code></li>
+<li>Content-Type</code> to the value <code>application/x-www-form-urlencoded, multipart/form-data</code> or <code>text/plain</code>.</li></ul></ul>
+The practical difference is that safe requests are sent right away, with the Origin header, while for the other ones the browser makes a preliminary<br>
+“preflight” request, asking for permission.<br>
+<strong>For safe requests:</strong><br><br>
+<ul>
+<li>→ The browser sends the <code>Origin</code> header with the origin</li>
+<li>← For requests without credentials (not sent by default), the server should set:<ul>
+<li><code>Access-Control-Allow-Origin</code> to <code>*</code> or same value as <code>Origin</code></li></ul>
+<li>← For requests with credentials, the server should set:<ul>
+<li><code>Access-Control-Allow-Origin</code> to same value as <code>Origin</code></li>
+<li><code>Access-Control-Allow-Credentials</code> to <code>true</code></li></ul></ul>
+Additionally, to grant JavaScript access to any response headers except <code>Cache-Control, Content-Language, Content-Type, Expires, Last-Modified</code> or <code>Pragma</code>, the server should list the allowed ones in <code>Access-Control-Expose-Headers</code> header.<br><br>
+<strong>For unsafe requests, a preliminary “preflight” request is issued before the requested one:</strong>
+<ul>
+<li>→ The browser sends an <code>OPTIONS</code> request to the same URL, with the headers:<ul>
+<li><code>Access-Control-Request-Method</code> has requested method.</li>
+<li><code>Access-Control-Request-Headers</code> lists unsafe requested headers.</li></ul>
+<li>← The server should respond with status 200 and the headers:<ul>
+<li><code>Access-Control-Allow-Methods</code> with a list of allowed methods</li>
+<li><code>Access-Control-Allow-Headers</code> with a list of allowed headers</li>
+<li><code>Access-Control-Max-Age</code> with a number of seconds to cache the permissions</li></ul>
+<li>Then the actual request is sent, and the previous “safe” scheme is applied</li>
+</ul>
+</p>
+<a href="https://javascript.info/fetch-crossorigin" target="_blank">Go to online tutorial</a>
+</body>
+</html>
