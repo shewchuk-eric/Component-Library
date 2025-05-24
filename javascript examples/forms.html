@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forms</title>
+    <style>
+        code {color: blue;}
+        body {padding-left: 10px;}
+    </style>
+</head>
+<body>
+    <p>
+        <h1>Navigation: form and elements</h1>
+        Document forms are members of the special collection <code>document.forms</code>.<br>
+        That’s a so-called “named collection”: it’s both named and ordered. We can use both the name or the<br>
+        number in the document to get the form.<br><br>
+        <code>document.forms[0]; // the first form in the document<br>
+        document.forms.my; // the form with the name 'my'</code><br><br>
+
+        When we have a form, then any element is available in the named collection <code>form.elements</code>. For instance:<br><br>
+        <code>&lt;form><br>
+            &lt;input name="one" value="1"><br>
+            &lt;input name="two" value="2"><br>
+            &lt;/form><br><br>
+        </code>   
+
+        <form>
+        <input name="one" value="1">
+        <input name="two" value="2">
+        </form>
+
+        <code>&lt;script><br>
+        // get the form<br>
+        let form1 = document.forms[0]; // &lt;form> element<br><br>
+        // get the element<br>
+        let elem = form1.elements.one; // &lt;input name="one"> element<br><br>
+        alert(elem.value); // 1<br>
+        &lt;/script></code><br><br>
+
+        <script>
+        // get the form // version one where the subelements are two steps away
+        // let form1 = document.forms[0];
+        // get the element
+        //let elem = form1.elements.one;
+        // alert(elem.value); // 1<br>
+        </script>
+
+        <script>
+        // get the form - version two that gets subelements in one step
+        // let elem = document.forms[0].elements.one;
+        // alert(elem.value); // 1
+        </script>
+
+        There may be multiple elements with the same name. This is typical with radio buttons and checkboxes.<br>
+        In that case, form.elements[name] is a collection. For instance:<br><br>
+        <code>
+            &lt;form name="my"><br>
+            &lt;input type="radio" name="age" value="10"><br>
+            &lt;input type="radio" name="age" value="20"><br>
+            &lt;/form><br><br>
+        </code>
+
+        <form name="form2">
+        <input type="radio" name="age" value="10">
+        <input type="radio" name="age" value="20">
+        </form>
+
+        <code>&lt;script><br>
+        let form2 = document.forms.form2;<br>
+        let ageElems = form2.elements.age;<br>
+        alert(ageElems[0].value); // [object HTMLInputElement]<br>
+        &lt;/script></code><br><br>
+
+        <script>
+         //let form2 = document.forms.form2;
+         //let ageElems = form2.elements.age;
+         //alert(ageElems[0]); // [object HTMLInputElement]
+         //alert(ageElems[0].value); // 10
+         //alert(ageElems[1].value); // 20
+        </script>
+
+        These navigation properties do not depend on the tag structure. All control elements, no matter how<br>
+        deep they are in the form, are available in <code>form.elements</code>.<br><br>
+
+        <h2>Fieldsets as “subforms”</h2>
+        A form may have one or many <code>&lt;fieldset></code> elements inside it. They also have elements property that lists<br>
+        form controls inside them. For instance:<br><br>
+
+        <code>&lt;body><br>
+        &lt;form id="form"><br>
+            &lt;fieldset name="userFields"><br>
+            &lt;legend>info&lt;/legend><br>
+            &lt;input name="login" type="text"><br>
+            &lt;/fieldset><br>
+        &lt;/form><br>
+        &lt;/body></code><br><br>
+        
+        <form id="form3">
+            <fieldset name="userFields">
+            <legend>info</legend>
+            <input name="login" type="text">
+            </fieldset>
+        </form>
+
+        <code>&lt;script><br>
+            alert(form.elements.login); // &lt;input name="login"><br>
+            let fieldset = form.elements.userFields;<br>
+            alert(fieldset); // HTMLFieldSetElement<br>
+            // we can get the input by name both from the form and from the fieldset<br>
+            alert(fieldset.elements.login == form.elements.login); // true<br>
+        &lt;/script></code><br><br>
+        
+        <script>
+            //alert(form3.elements.login); // [object HTMLInputElement]
+            //let fieldset = form3.elements.userFields;
+            //alert(fieldset); // [HTMLFieldSetElement]
+                 // we can get the input by name both from the form and from the fieldset
+            //alert(fieldset.elements.login == form3.elements.login); // true
+        </script>
+
+        <h2>Shorter notation: form.name</h2>
+        There’s a shorter notation: we can access the element as <code>form[index/name]</code>. In other words, instead of<br>
+        <code>form.elements.login</code> we can write <code>form.login</code>. That also works, but there’s a minor issue: if we access<br>
+        an element, and then change its name, then it is still available under the old name (as well as under<br>
+        the new one). That’s easy to see in an example:<br><br>
+
+        <code>&lt;form id="form4"><br>
+        &lt;input name="login"><br>
+        &lt;/form></code><br><br>
+        
+        <form id="form4">
+        <input name="login">
+        </form>
+
+        <code>&lt;script><br>
+        alert(form4.elements.login == form4.login); // true, the same &lt;input><br>
+        form4.login.name = "username"; // change the name of the input<br>
+        // form4.elements updated the name:<br>
+        alert(form4.elements.login); // undefined<br>
+        alert(form4.elements.username); // input<br>
+        // form allows both names: the new one and the old one<br>
+        alert(form4.username == form4.login); // true<br>
+        &lt;/script></code><br><br>
+        
+        <script>
+        //alert(form4.elements.login == form4.login); // true, the same <input>
+        //form4.login.name = "username"; // change the name of the input
+             // form4.elements updated the name:
+        //alert(form4.elements.login); // undefined
+        //alert(form4.elements.username); // input
+             // form allows both names: the new one and the old one
+        //alert(form4.username == form4.login); // true
+        </script><br>
+        That’s usually not a problem, however, because we rarely change names of form elements.<br><br>
+
+        <h2>Backreference: element.form</h2>
+        For any element, the form is available as element.form. So a form references all elements, and elements<br>
+        reference the form. For instance:<br>
+
+        <code>&lt;form id="form"><br>
+        &lt;input type="text" name="login"><br>
+        &lt;/form></code><br><br>
+        
+        <form id="form">
+        <input type="text" name="login">
+        </form>
+
+        <code>&lt;script><br>
+        // form -> element<br>
+        let login = form.login;<br><br>
+        // element -> form<br>
+        alert(login.form); // HTMLFormElement<br>
+        &lt;/script></code><br><br>
+        
+        <script>
+        // form -> element
+        //let login = form.login;
+        // element -> form
+        //alert(login.form); // HTMLFormElement
+        </script>
+
+        <h2>Form elements</h2>
+        <h3>input and textarea</h3>
+        We can access their value as <code>input.value</code> (string) or <code>input.checked</code> (boolean)<br>
+        for checkboxes and radio buttons. Like this:<br><br>
+
+        <code>input.value = "New value";<br>
+        textarea.value = "New text";<br>
+        input.checked = true; // for a checkbox or radio button</code><br><br>
+
+        <em>Use <code>textarea.value</code>, not <code>textarea.innerHTML</code><br>
+        Please note that even though <code>&lt;textarea>...&lt;/textarea></code> holds its value as nested HTML, we should never<br>
+        use <code>textarea.innerHTML</code> to access it. It stores only the HTML that was initially on the page, not the current value.</em><br><br>
+
+        <h3>select and option</h3>
+        A <code>&lt;select></code> element has 3 important properties:
+
+        <ul><li><code>select.options</code> – the collection of <code>&lt;option></code> subelements</li>
+        <code><li>select.value</code> – the value of the currently selected <code>&lt;option></code></li>
+        <code><li>select.selectedIndex</code> – the number of the currently selected <code>&lt;option></code></li></ul>
+        They provide three different ways of setting a value for a <code>&lt;select></code>:
+
+        Find the corresponding <code>&lt;option></code> element (e.g. among <code>select.options</code>)<br>
+        and set its <code>option.selected</code> to <code>true</code>. If we know a new value: set <code>select.value</code> to the new value. If we know the new option<br>
+        number: set <code>select.selectedIndex</code> to that number. Here is an example of all three methods:<br><br>
+
+        <code>&lt;select id="select"><br>
+        &lt;option value="apple">Apple&lt;/option><br>
+        &lt;option value="pear">Pear&lt;/option><br>
+        &lt;option value="banana">Banana&lt;/option><br>
+        &lt;/select></code><br><br>
+        
+        <select id="select">
+        <option value="apple">Apple</option>
+        <option value="pear">Pear</option>
+        <option value="banana">Banana</option>
+        </select><br><br>
+
+        <code>&lt;script><br>
+        // all three lines do the same thing<br>
+        select.options[2].selected = true;<br>
+        select.selectedIndex = 2;<br>
+        select.value = 'banana';<br>
+        // please note: options start from zero, so index 2 means the 3rd option.<br>
+        &lt;/script></code><br><br>
+        
+        <script>
+             // all three lines do the same thing
+        //select.options[2].selected = true;
+            //alert(select.value);
+        //select.selectedIndex = 1;
+            //alert(select.value);
+        //select.value = 'apple';
+            //alert(select.value);
+             // please note: options start from zero, so index 2 means the 3rd option.
+        </script>
+
+        Unlike most other controls, <code>&lt;select></code> allows to select multiple options at once if it has multiple attribute.<br>
+        This attribute is rarely used, though. For multiple selected values, use the first way of setting values: add/remove<br>
+        the selected property from <code>&lt;option></code> subelements. Here’s an example of how to get selected values from a multi-select:<br><br>
+
+        <code>&lt;select id="select2" multiple><br>
+        &lt;option value="blues" selected>Blues&lt;/option><br>
+        &lt;option value="rock" selected>Rock&lt;/option><br>
+        &lt;option value="classic">Classic&lt;/option><br>
+        &lt;/select></code><br><br>
+
+        <select id="select2" multiple>
+        <option value="blues" selected>Blues</option>
+        <option value="rock" selected>Rock</option>
+        <option value="classic">Classic</option>
+        </select><br><br>
+
+        <code>&lt;script><br>
+        // get all selected values from multi-select<br>
+        let selected = Array.from(select2.options)<br>
+            .filter(option => option.selected)<br>
+            .map(option => option.value);<br><br>
+
+        alert(selected); // blues,rock<br>
+        &lt;/script></code><br><br>
+        
+        <script>
+        // get all selected values from multi-select
+        //let selected = Array.from(select2.options)
+            //.filter(option => option.selected)
+            //.map(option => option.value);
+
+        //alert(selected); // blues,rock
+        </script>
+
+        <h3>new Option</h3>
+        In the specification there’s a nice short syntax to create an <code>&lt;option></code> element:<br><br>
+        <code>option = new Option(text, value, defaultSelected, selected);</code><br><br>
+        This syntax is optional. We can use <code>document.createElement('option')</code> and set attributes manually. Still, it<br>
+        may be shorter, so here are the parameters:<br>
+
+        <ul><li><code>text</code> – the text inside the option</li>
+        <code><li>value</code> – the option value</li>
+        <code><li>defaultSelected</code> – if true, then selected HTML-attribute is created</li>
+        <code><li>selected</code> – if true, then the option is selected.</code></li></ul>
+
+        The difference between <code>defaultSelected</code> and <code>selected</code> is that <code>defaultSelected</code> sets the HTML-attribute (that we can get<br>
+        using <code>option.getAttribute('selected'))</code>, while <code>selected</code> sets whether the option is selected or not. In practice, one should<br>
+        usually set both values to true or false. (Or, simply omit them; both default to false.) For instance, here’s a new<br>
+        “unselected” option:<br><br>
+
+        <code>let option = new Option("Text", "value");<br>
+        // creates &lt;option value="value">Text&lt;/option></code><br><br>
+        The same option, but selected:<br>
+
+        <code>let option = new Option("Text", "value", true, true);</code><br><br>
+        Option elements have properties:<br>
+
+        <ul><li><code>option.selected</code> - Is the option selected.
+        <li><code>option.index</code> - The number of the option among the others in its &lt;select></code></li>
+        <li><code>option.text</code> - Text content of the option (seen by the visitor).</code></li></ul>
+
+
+
+        <h1>Forms: event and method submit</h1>
+        The submit event is usually used to validate the form before sending it to the server or to abort the submission and process it in JavaScript.<br>
+        The method <code>form.submit()</code> allows to initiate form sending from JavaScript. We can use it to dynamically create and send our own forms to server.<br><br>
+
+        <h2>Event: submit</h2>
+        There are two main ways to submit a form:<br>
+
+        <strong>The first</strong> – to click <code>&lt;input type="submit"></code> or <code>&lt;input type="image"></code>.<br>
+        <strong>The second</strong> – press <code>Enter</code> on an input field.<br><br>
+        Both actions lead to submit event on the form. The handler can check the data, and if there are errors, show them and call <code>event.preventDefault()</code>, then the form<br>
+        won’t be sent to the server. In the code below both actions show alert and the form is not sent anywhere due to return false:<br><br>
+
+        <code>&lt;form onsubmit="alert('submit!');return false"><br>
+        First: Enter in the input field &lt;input type="text" value="text"><br>
+        Second: Click "submit": &lt;input type="submit" value="Submit"><br>
+        &lt;/form></code><br><br>
+        
+        <form onsubmit="alert('submit!');return false">
+            <fieldset>
+                First: Enter in the input field <input type="text" value="text"><br>
+                Second: Click "submit": <input type="submit" value="Submit">
+            </fieldset>
+        </form><br><br>
+
+        Relation between submit and click - When a form is sent using Enter on an input field, a click event triggers on the <code>&lt;input type="submit"></code>. That’s<br>
+        rather funny, because there was no click at all. 
+
+        <h2>Method: submit</h2>
+        To submit a form to the server manually, we can call <code>form.submit()</code>. Then the submit event is not generated. It is assumed that if the programmer calls<br>
+        <code>form.submit()</code>, then the script already did all related processing. Sometimes that’s used to manually create and send a form, like this:<br><br>
+
+        <code>let form = document.createElement('form');<br>
+        form.action = 'https://google.com/search';<br>
+        form.method = 'GET';<br>
+        form.innerHTML = '&lt;input name="q" value="test">';<br>
+        // the form must be in the document to submit it<br>
+        document.body.append(form);<br>
+        form.submit();</code><br><br>
+
+        <h2>Summary</h2>
+        Form navigation:<br><br>
+
+        <code>document.forms</code> - A form is available as <code>document.forms[name/index].</code><br><br>
+        <code>form.elements</code> - Form elements are available as <code>form.elements[name/index]</code>, or can use just <code>form[name/index]</code>. The<br>
+        elements property also works for <code>&lt;fieldset></code>.
+        <code>element.form</code> - Elements reference their form in the form property.<br><br>
+        Value is available as <code>input.value, textarea.value, select.value, etc.</code> (For checkboxes and radio buttons, use <code>input.checked</code> to determine<br>
+        whether a value is selected.)<br><br>
+
+        For <code>&lt;select></code>, one can also get the value by the index <code>select.selectedIndex</code> or through the options collection <code>select.options</code>.<br><br>
+        <a href="https://javascript.info/form-elements" target="_blank">Go to online tutorial</a>
+        <br><br>
+    <a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Forms/Form_validation" target="_blank">Validation Tutorial</a>
+    </p>
+</body>
+</html>

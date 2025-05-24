@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fetch</title>
     <style>
-        code 
-            {color: blue;}
+        code {color: blue;}
+        body {padding-left: 10px;}
     </style>
 </head>
 <body>
@@ -32,7 +32,7 @@
         let json = await response.json();<br>
         } else {<br>
         alert("HTTP-Error: " + response.status);<br>
-        }<br><br>
+        }</code><br><br>
         <strong>Second, to get the response body, we need to use an additional method call.</strong><br><br>
         Response provides multiple promise-based methods to access the body in various formats:<br>
         <ul>
@@ -132,7 +132,7 @@
             let response = await fetch('/article/fetch/post/image', {<br>
                 method: 'POST',<br>
                 body: blob<br>
-            });<br><br>
+            });</code><br><br>
             // the server responds with confirmation and the image size<br>
             let result = await response.json();<br>
             alert(result.message);<br>

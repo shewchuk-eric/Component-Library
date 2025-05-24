@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Working With Form Data</title>
+    <style>
+        code {color: blue;}
+        body {padding-left: 10px;}
+    </style>
+</head>
+<body>
+<p>
+<h1>Send a simple form</h1>
+  <code>&lt;form id="formElem"><br>
+  &lt;input type="text" name="name" value="John"><br>
+  &lt;input type="text" name="surname" value="Smith"><br>
+  &lt;input type="submit"><br>
+  &lt;/form></code><br><br>
+
+  <form id="formElem">
+  <input type="text" name="name" value="John">
+  <input type="text" name="surname" value="Smith">
+  <input type="submit">
+  </form><br>
+
+  <code>&lt;script>
+  formElem.onsubmit = async (e) => { // no validation is done here, just send it<br>
+    e.preventDefault(); // prevent Default form handling (probably '#' since specialized handling is being done here)<br>
+
+    let response = await fetch('/article/formdata/post/user', {<br>
+      method: 'POST',<br>
+      body: new FormData(formElem) // create an object from the form data<br>
+    });<br>
+
+    let result = await response.json(); // receive data as JSON file<br>
+
+    alert(result.message);<br>
+  };<br>
+  &lt;/script></code><br><br>
+  
+  <script>
+  formElem.onsubmit = async (e) => { // no validation is done here, just send it
+    e.preventDefault(); // prevent Default form handling (probably '#' since specialized handling is being done here)
+
+    let response = await fetch('/article/formdata/post/user', {
+      method: 'POST',
+      body: new FormData(formElem) // create an object from the form data
+    });
+
+    let result = await response.json(); // receive data as JSON file
+
+    alert(result.message);
+  };
+  </script>
+
+
+    <h2>FormData Methods</h2>
+    We can modify fields in FormData with methods:<br>
+
+    <ul><li><code>formData.append(name, value)</code> – add a form field with the given name and value</li>
+    <li><code>formData.append(name, blob, fileName)</code> – add a field as if it were <code>&lt;input type="file"></code>, the third argument fileName sets file name (not form field name), as it were a name of the </code>file in user’s filesystem</li>
+    <li><code>formData.delete(name)</code> – remove the field with the given name</li>
+    <li><code>formData.get(name)</code> – get the value of the field with the given name</li>
+    <li><code>formData.has(name)</code> – if there exists a field with the given name, returns true, otherwise false</li></li></ul>
+
+    A form is technically allowed to have many fields with the same name, so multiple calls to append add more same-named fields. There’s also method set, with the same syntax as append. The difference is<br> that <code>.set</code> removes all fields with the given name, and then appends a new field. So it makes sure there’s only one field with such name, the rest is just like append:<br>
+
+    <ul><li><code>formData.set(name, value)</code></li>
+    <li><code>formData.set(name, blob, fileName)</code>.</li></ul>
+
+    Also we can iterate over formData fields using for..of loop:<br><br>
+
+    <code>let formData = new FormData();<br>
+    formData.append('key1', 'value1');<br>
+    formData.append('key2', 'value2');<br>
+    // List key/value pairs<br>
+    for(let [name, value] of formData) {<br>
+    alert(`${name} = ${value}`); // key1 = value1, then key2 = value2<br>
+    }</code><br>
+
+    <h2>Sending a form with a file</h2>
+    The form is always sent as Content-Type: multipart/form-data, this encoding allows to send files. So, <code>&lt;input type="file">&lt;</code> fields are sent also, similar to a usual form submission. Here’s an Example:<br><br>
+
+    <code>&lt;form id="formElem2"><br>
+    &lt;input type="text" name="firstName" value="John"><br>
+    Picture: &lt;input type="file" name="picture" accept="image/*"><br>
+    &lt;input type="submit"><br>
+    &lt;/form></code><br><br>
+    
+    <form id="formElem2">
+    <input type="text" name="firstName" value="John">
+    Picture: <input type="file" name="picture" accept="image/*">
+    <input type="submit">
+    </form><br>
+
+    <code>&lt;script><br>
+    formElem2.onsubmit = async (e) => {<br>
+        e.preventDefault();<br>
+        let response = await fetch('/article/formdata/post/user-avatar', {<br>
+        method: 'POST',<br>
+        body: new FormData(formElem2)<br>
+        });<br>
+        let result = await response.json();<br>
+        alert(result.message);<br>
+    };<br>
+    &lt;/script></code><br><br>
+    
+    <script>
+    formElem2.onsubmit = async (e) => {
+        e.preventDefault();
+
+        let response = await fetch('/article/formdata/post/user-avatar', {
+        method: 'POST',
+        body: new FormData(formElem2)
+        });
+
+        let result = await response.json();
+
+        alert(result.message);
+    };
+    </script>
+
+    <h2>Sending a form with Blob data</h2>
+    As we’ve seen in the chapter Fetch, it’s easy to send dynamically generated binary data e.g. an image, as Blob. We can supply it directly as fetch parameter body. In practice though, it’s often convenient<br>to send an image not separately, but as a part of the form, with additional fields, such as “name” and other metadata. Also, servers are usually more suited to accept multipart-encoded forms, rather than<br>raw binary data. This example submits an image from <code>&lt;canvas></code>, along with some other fields, as a form, using FormData:<br><br>
+
+    <code>&lt;canvas id="canvasElem" width="100" height="80" style="border:1px solid">&lt;/canvas><br>
+    &lt;input type="button" value="Submit" onclick="submit()"><br><br>
+
+    &lt;script><br>
+        canvasElem.onmousemove = function(e) {<br>
+        let ctx = canvasElem.getContext('2d');<br>
+        ctx.lineTo(e.clientX, e.clientY);<br>
+        ctx.stroke();<br>
+        };<br>
+        async function submit() {<br>
+        let imageBlob = await new Promise(resolve => canvasElem.toBlob(resolve, 'image/png'));<br>
+        let formData = new FormData();<br>
+        formData.append("firstName", "John");<br>
+        formData.append("image", imageBlob, "image.png");<br>
+        let response = await fetch('/article/formdata/post/image-form', {<br>
+            method: 'POST',<br>
+            body: formData<br>
+        });<br>
+        let result = await response.json();<br>
+        alert(result.message);<br>
+        }<br>
+    &lt;/script></code><br><br>
+    
+    <canvas id="canvasElem" width="100" height="80" style="border:1px solid"></canvas><br>
+    <input type="button" value="Submit" onclick="submit()"><br>
+
+    <script>
+        canvasElem.onmousemove = function(e) {
+        let ctx = canvasElem.getContext('2d');
+        ctx.lineTo(e.clientX, e.clientY);
+        ctx.stroke();
+        };
+
+        async function submit() {
+        let imageBlob = await new Promise(resolve => canvasElem.toBlob(resolve, 'image/png'));
+
+        let formData = new FormData();
+        formData.append("firstName", "John");
+        formData.append("image", imageBlob, "image.png");
+
+        let response = await fetch('/article/formdata/post/image-form', {
+            method: 'POST',
+            body: formData
+        });
+        let result = await response.json();
+        alert(result.message);
+        }
+
+    </script><br>
+
+    Please note how the image Blob is added:<br><br>
+
+    <code>formData.append("image", imageBlob, "image.png");</code><br><br>
+    That’s same as if there were <code>&lt;input type="file" name="image"></code> in the form, and the visitor submitted a file named "image.png" (3rd argument) with the data imageBlob (2nd argument) from their filesystem.<br>
+    The server reads form data and the file, as if it were a regular form submission.<br><br>
+
+    <a href="https://javascript.info/formdata" target="_blank">Go to online tutorial</a>
+    <br><br>
+    <a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Forms/Form_validation" target="_blank">Validation Tutorial</a>
+    </p>
+</body>
+</html>
