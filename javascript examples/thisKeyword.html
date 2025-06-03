@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>'this' keyword</title>
+</head>
+<body>
+    <script>
+        function Customer(clientContact) { // receive an array into constructor
+            this.name = clientContact[0], // assign values from array using 'this' keyword
+            this.age = clientContact[1],
+            this.state = clientContact[2]
+        }
+
+            function contact(customer) { // show customer values in console
+                console.log('Name: ' +customer.name);
+                console.log('Age: ' +customer.age);
+                console.log('State of Residence: ' +customer.state);
+            }
+
+            function getData() {
+                let getName = prompt('Name? '); // use prompts to get information - avoiding a form in this test
+                let getAge = prompt('Age? ');
+                let getResidence = prompt('State? ');
+                return [getName, getAge, getResidence]; // return collected values as an array
+            }
+
+            let clientContact = getData(); // create box to hold data for new client contact
+            const one = new Customer(clientContact); // use collected data to create new contact
+            contact(one); // display collected information to console to validate correct collection
+            
+            clientContact = getData(); // do it all again to see it's working correctly
+            const two = new Customer(clientContact);
+            contact(two);
+            contact(one); // prove nothing changed in 'one' after creation of 'two'
+
+
+
+        /**** Part Two - bind/call ****/
+        function saySomething() {
+		    return `say ${this.word}`
+		}
+
+	    const say = {word: 'hello'};
+        const say2 = {word: 'humbug'};
+
+        const sayWord = saySomething.bind(say); // use 'bind' to send a chosen value into any function
+        console.log(sayWord()); // say hello
+
+        console.log(saySomething.bind(say2)()); // using 'bind' directly - - need to use the extra ( ) to call the function after binding the value we want to use
+        
+
+        function sayMore(option) { // using bind/call when there are other parameters to pass
+		    if (option === true) {
+                return `You are honest, ${this.name}`;
+            } else if (option === false) {
+                return `You tell lies, ${this.name}`;
+            }
+		}
+
+	    const option = false;
+        const option2 = true;
+        const person = {name: 'Jim'};
+
+        const test = sayMore.call(person, option); // use 'call' to activate a function with extra parameters
+        console.log(test); // say hello
+
+        console.log(sayMore.bind(person, option2)()); // using 'bind' directly - - need to use the extra ( ) to call the function after binding the value we want to use
+
+        
+        /**** Part Three - a Callback scope issue ****/
+        function Person(n) { // create a constructor for a Person object
+            this.name = n
+            this.talk = function() { // a method to print the new Person object to console
+                console.log(this)
+            }
+
+            setTimeout(function() { // code inside this function is invisible to ‘this’
+                console.log(this)
+            }.bind(this), 100) // adding ‘bind’ here is outside the function brackets and is seen by the Person constructor so ‘this’ will be recognized
+        }
+
+        const me = new Person('Eric')
+        me.talk()
+
+    </script>
+</body>
+</html>
